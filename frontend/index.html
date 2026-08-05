@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Сколько Вы прожили</title>
+
+  <!-- Иконка вкладки в браузере — отдельный маленький файл-->
+  <link rel="icon" href="/image/favicon.png" />
+
+  <!-- Описание для поисковиков -->
+  <meta name="description"
+        content="Введите дату рождения — и узнайте, сколько дней, часов и секунд уже уместилось в Вашей жизни." />
+
+  <!-- Open Graph: то, что покажет Telegram, WhatsApp, ВКонтакте и прочие,
+       когда кто-то отправит ссылку.  -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://onemoreday.fun/" />
+  <meta property="og:site_name" content="onemoreday.fun" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:title" content="Сколько Вы прожили?" />
+  <meta property="og:description"
+        content="Введите дату рождения — и узнайте, сколько дней, часов и секунд уже уместилось в Вашей жизни." />
+  <meta property="og:image" content="https://onemoreday.fun/image/preview.jpg" />
+  <meta property="og:image:width" content="800" />
+  <meta property="og:image:height" content="800" />
+  <meta property="og:image:alt" content="Солнце над водой" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Сколько Вы прожили?" />
+  <meta name="twitter:description"
+        content="Введите дату рождения — и узнайте, сколько дней, часов и секунд уже уместилось в Вашей жизни." />
+  <meta name="twitter:image" content="https://onemoreday.fun/image/preview.jpg" />
+
+  <!-- Vue 3 подключен напрямую с CDN — никакой сборки и npm не нужно -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <!-- Генератор QR-кода — тоже с CDN, по той же причине -->
+  <script src="https://unpkg.com/qrcode-generator@1.4.4/qrcode.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Сюда Vue смонтирует приложение -->
+  <div id="app">
+    <div class="card">
+      <!-- Экранов три: 'form' -> 'wish' -> 'share'.
+           Заголовок свой у каждого, собирается в computed title. -->
+      <h1>{{ title }}</h1>
+
+      <!-- ЭКРАН 1: форма и подсчёт ------------------------------------- -->
+      <template v-if="screen === 'form'">
+        <p class="subtitle">Введите дату рождения — всё посчитаем.</p>
+
+        <div class="form">
+          <!-- Восемь клеток под ДДММГГГГ.
+               Один v-for на все восемь, точки-разделители вставляем по индексу.
+               ref="cells" собирает все input'ы в массив — по нему двигается фокус. -->
+          <div class="date-fields">
+            <template v-for="(digit, i) in digits" :key="i">
+              <span v-if="i === 2 || i === 4" class="dot">.</span>
+              <input
+                ref="cells"
+                class="cell"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                maxlength="1"
+                :aria-label="cellLabels[i]"
+                :value="digit"
+                @input="onInput($event, i)"
+                @keydown="onKeydown($event, i)"
+                @paste="onPaste($event, i)"
+                @focus="$event.target.select()"
+              />
+            </template>
+          </div>
+          <p class="hint">день · месяц · год</p>
+
+          <div class="buttons">
+            <button @click="calculate" :disabled="loading">
+              {{ loading ? 'Считаю…' : 'Посчитать' }}
+            </button>
+            <!-- Очистить: сбрасывает клетки, результат и ошибку.
+                 Пока форма пустая и считать нечего — кнопка неактивна. -->
+            <button
+              class="secondary"
+              @click="reset"
+              :disabled="loading || isEmpty"
+            >
+              Очистить
+            </button>
+          </div>
+        </div>
+
+        <!-- Ошибка от бэкенда или сети -->
+        <p v-if="error" class="error">{{ error }}</p>
+
+        <!-- Результат: показывается только когда он есть.
+             Это разбивка, а не перевод одного срока в разные единицы:
+             каждая единица — остаток после предыдущей. -->
+        <div v-if="result" class="result">
+          <p>Вы прожили:</p>
+          <ul class="age">
+            <li v-for="part in ageParts" :key="part.label">
+              <b>{{ part.value }}</b> {{ part.label }}
+            </li>
+          </ul>
+          <button class="wide" @click="showWish">Понятно</button>
+        </div>
+      </template>
+
+      <!-- ЭКРАН 2: пожелание на день ------------------------------------ -->
+      <template v-else-if="screen === 'wish'">
+        <p class="subtitle"> </p>
+
+        <!-- Текущая дата теми же клетками, что и в форме,
+             только демонстарция, не для ввода -->
+        <div class="date-fields">
+          <template v-for="(digit, i) in todayDigits" :key="i">
+            <span v-if="i === 2 || i === 4" class="dot">.</span>
+            <span class="cell readonly">{{ digit }}</span>
+          </template>
+        </div>
+
+        <p class="wish-box">
+          Сегодня к сумме Вашей жизни добавляется ещё один день.
+          Так пусть же он будет {{ wish }}.
+        </p>
+
+        <p v-if="shareError" class="error">{{ shareError }}</p>
+
+        <button class="wide" @click="showShare">Спасибо</button>
+      </template>
+
+      <!-- ЭКРАН 3: чем поделиться --------------------------------------- -->
+      <template v-else>
+        <img class="qr" :src="qrDataUrl" alt="QR-код со ссылкой на этот сайт" />
+        <p class="share-text">
+          Поделитесь хорошим настроением с теми, кто Вам дорог!
+        </p>
+
+        <p v-if="shareError" class="error">{{ shareError }}</p>
+
+        <!-- Возврат к началу: reset() чистит всё и возвращает на первый экран -->
+        <button class="wide" @click="reset">Посчитать заново</button>
+
+        <!-- Поделиться ссылкой на сервис: системное меню на телефоне,
+             копирование в буфер на компьютере -->
+        <button class="outline wide" @click="share">
+          {{ copied ? 'Ссылка скопирована' : 'Поделиться' }}
+        </button>
+      </template>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

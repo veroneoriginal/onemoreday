@@ -1,0 +1,193 @@
+/* Простые стили, чтобы страница выглядела опрятно. Ничего лишнего. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #1f2937;
+}
+
+.card {
+  background: #fff;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  width: 380px;
+  max-width: 90vw;
+}
+
+/* Заголовок и подзаголовок — по центру карточки, как клетки и подписи под ними */
+h1 {
+  margin: 0 0 4px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0 0 20px;
+  color: #6b7280;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Форма теперь в столбик: ряд клеток, подпись, кнопка */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Ряд из восьми клеток с точками-разделителями */
+.date-fields {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.cell {
+  width: 30px;
+  padding: 10px 0;
+  font-size: 18px;
+  text-align: center;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+}
+
+/* Те же клетки, но не для ввода: показываем в них сегодняшнюю дату */
+.cell.readonly {
+  display: inline-block;
+  background: #f9fafb;
+  color: #6b7280;
+  line-height: 1;
+}
+
+.cell:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.dot {
+  color: #9ca3af;
+  font-size: 18px;
+  padding: 0 2px;
+}
+
+.hint {
+  margin: 0 0 4px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* Две кнопки в ряд, делят ширину поровну */
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  flex: 1;
+  padding: 10px 16px;
+  font-size: 16px;
+  color: #fff;
+  background: #6366f1;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* "Очистить" — второстепенная кнопка, не спорит с "Посчитать" */
+button.secondary {
+  color: #6366f1;
+  background: #eef2ff;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  margin-top: 16px;
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.result {
+  margin-top: 20px;
+}
+
+.result p {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+/* Разбивка возраста: каждая единица на своей строке */
+.result .age {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* Кнопка во всю ширину карточки: «Понятно» и «Спасибо» */
+button.wide {
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* Две широкие кнопки подряд — между собой стоят теснее, чем от текста над ними */
+button.wide + button.wide {
+  margin-top: 8px;
+}
+
+/* «Поделиться» — та же палитра, но контуром: рядом с «Посчитать заново»
+   она не должна спорить за внимание */
+button.outline {
+  color: #6366f1;
+  background: #fff;
+  border: 1px solid #c7d2fe;
+}
+
+/* Само пожелание — в рамке, чтобы читалось как отдельная мысль */
+.wish-box {
+  margin: 20px 0 0;
+  padding: 16px;
+  border: 1px solid #c7d2fe;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Экран «поделиться»: QR-код и подпись под ним */
+.qr {
+  display: block;
+  width: 180px;
+  height: 180px;
+  margin: 20px auto 0;
+  image-rendering: pixelated; /* чтобы клетки кода не размывались */
+}
+
+.share-text {
+  margin: 16px 0 0;
+  text-align: center;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.result b {
+  color: #6366f1;
+}
