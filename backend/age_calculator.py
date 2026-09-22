@@ -1,8 +1,8 @@
 """
-Чистая логика расчёта возраста.
+Чистая логика расчёта времени до события.
 
 Здесь нет ничего про сеть или HTTP — только функция, которая берёт
-дату рождения, сравнивает её с сегодняшним днём и возвращает прожитое
+дату события, сравнивает её с текущим моментом и возвращает оставшееся
 время в разных единицах. Такую логику легко тестировать и переиспользовать.
 """
 
@@ -14,11 +14,11 @@ from datetime import date, datetime
 # от "формат тот, но такой даты не бывает" (например, 31 февраля)
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-# Дольше человек не живёт — всё, что больше, считаем опечаткой
-MAX_AGE_YEARS = 150
+# Ждать события дольше этого вряд ли кто-то собирается — считаем опечаткой
+MAX_YEARS_AHEAD = 100
 
 
-def parse_birthdate(text: str) -> date:
+def parse_date(text: str) -> date:
     """
     Разобрать дату из строки 'ГГГГ-ММ-ДД'. Иначе — ValueError.
     """
@@ -46,14 +46,16 @@ def add_months(
     return date(year, month, day)
 
 
-def calculate_age(
-        birthdate: date,
+def calculate_until(
+        target: date,
         now: datetime | None = None) -> dict:
     """
-    Разложить прожитое время на годы, месяцы, дни, часы, минуты и секунды.
+    Разложить время до события на годы, месяцы, дни, часы, минуты и секунды.
 
-    Это разбивка: каждая следующая единица — остаток после предыдущей.
-    Для 16.12.1992 на 29 июля 2026 получится 33 года, 7 месяцев, 13 дней и остаток часов.
+    Месяцы отсчитываем вперёд от текущего момента,
+    остаток добираем до полуночи дня события.
+    Дополнительно total_days — сколько календарных дней осталось
+    (завтра — 1, послезавтра — 2), для пожелания.
 
     Параметр now нужен только для тестов: если его не передать,
     берётся текущий момент.
@@ -61,30 +63,30 @@ def calculate_age(
     if now is None:
         now = datetime.now()
 
-    # Точное время рождения мы не спрашиваем, поэтому считаем от полуночи
-    born = datetime.combine(birthdate, datetime.min.time())
-    if born > now:
-        raise ValueError("Дата рождения не может быть в будущем")
+    # Время события мы не спрашиваем, поэтому считаем до его полуночи.
+    # Сегодняшняя полночь уже прошла — значит, сегодняшний день тоже не подходит.
+    event = datetime.combine(target, datetime.min.time())
+    if event <= now:
+        raise ValueError("Выберите дату в будущем — хотя бы завтра")
 
-    # 1. Сколько всего полных календарных месяцев прожито.
-    # Если день месяца ещё не наступил — последний месяц не дожит, вычитаем его.
-    total_months = (now.year - birthdate.year) * 12 + (now.month - birthdate.month)
-    if now.day < birthdate.day:
+    def shifted(n: int) -> datetime:
+        """Текущий момент, сдвинутый на n месяцев вперёд."""
+        return datetime.combine(add_months(now.date(), n), now.time())
+
+    # 1. Сколько полных календарных месяцев помещается до события.
+    # Если сдвиг перескочил через событие — последний месяц неполный, убираем его.
+    total_months = (target.year - now.year) * 12 + (target.month - now.month)
+    while total_months > 0 and shifted(total_months) > event:
         total_months -= 1
 
     # 2. Полные годы и остаток месяцев сверх них (0..11)
     years, months = divmod(total_months, 12)
 
-    if years > MAX_AGE_YEARS:
-        raise ValueError("Возраст слишком большой")
+    if years >= MAX_YEARS_AHEAD:
+        raise ValueError("Слишком далёкая дата")
 
-    # 3. Дата последней «месячной годовщины» — от неё считаем остаток.
-    # Разницу берём в реальном времени, поэтому високосные годы и разная
-    # длина месяцев учитываются сами собой.
-    last_anniversary = datetime.combine(
-        add_months(birthdate, total_months), datetime.min.time()
-    )
-    rest = now - last_anniversary
+    # 3. Остаток от последнего полного месяца до события
+    rest = event - shifted(total_months)
 
     days = rest.days
     hours, remainder = divmod(rest.seconds, 3600)
@@ -97,4 +99,5 @@ def calculate_age(
         "hours": hours,
         "minutes": minutes,
         "seconds": seconds,
+        "total_days": (target - now.date()).days,
     }

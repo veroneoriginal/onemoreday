@@ -2,10 +2,10 @@
 Минимальный HTTP-сервер на стандартной библиотеке Python (без зависимостей).
 
 Поднимает один endpoint:
-    GET /api/age?birthdate=1992-12-16  ->  {"years": 33, "months": 7, "days": 13, ...}
+    GET /api/until?date=2028-07-17  ->  {"years": 1, "months": 9, ..., "total_days": 664}
 
-Это и есть "бэкенд": он принимает запрос от фронтенда, считает возраст
-через age_calculator и возвращает результат в формате JSON.
+Это и есть "бэкенд": он принимает запрос от фронтенда, считает время
+до события через age_calculator и возвращает результат в формате JSON.
 
 Запуск:
     python backend/server.py
@@ -16,7 +16,7 @@ import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
-from age_calculator import calculate_age, parse_birthdate
+from age_calculator import calculate_until, parse_date
 
 # Из интернета к бэкенду напрямую не достучаться:
 # снаружи запросы принимает nginx и уже он передаёт их сюда.
@@ -24,7 +24,7 @@ HOST = "127.0.0.1"
 PORT = 8000
 
 
-class AgeRequestHandler(BaseHTTPRequestHandler):
+class UntilRequestHandler(BaseHTTPRequestHandler):
     def _send_json(self, status: int, payload: dict):
         """Отправить ответ в виде JSON + заголовки CORS."""
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -48,31 +48,24 @@ class AgeRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
 
-        if parsed.path != "/api/age":
+        if parsed.path != "/api/until":
             self._send_json(404, {"error": "Неизвестный путь"})
             return
 
-        # Достаём параметр ?birthdate=... из строки запроса
+        # Достаём параметр ?date=... из строки запроса
         params = parse_qs(parsed.query)
-        raw_birthdate = params.get("birthdate", [None])[0]
+        raw_date = params.get("date", [None])[0]
 
-        if raw_birthdate is None:
-            self._send_json(
-                400,
-                {"error": "Не передан параметр 'birthdate'"}
-            )
+        if raw_date is None:
+            self._send_json(400, {"error": "Не передан параметр 'date'"})
             return
 
         try:
-            birthdate = parse_birthdate(text=raw_birthdate)
-            result = calculate_age(birthdate=birthdate)
+            target = parse_date(text=raw_date)
+            result = calculate_until(target=target)
         except ValueError as e:
-            # Либо дата не распарсилась, либо calculate_age её отверг
-            message = str(e) if str(e) else "Некорректная дата рождения"
-            self._send_json(
-                400,
-                {"error": message},
-            )
+            # Либо дата не распарсилась, либо calculate_until её отверг
+            self._send_json(400, {"error": str(e) or "Некорректная дата"})
             return
 
         self._send_json(200, result)
@@ -86,10 +79,10 @@ def main():
     # ThreadingHTTPServer, а не HTTPServer: браузер открывает про запас лишние
     # соединения и ничего в них не шлёт. Однопоточный сервер вставал бы на таком
     # пустом сокете и переставал отвечать на настоящие запросы.
-    server = ThreadingHTTPServer((HOST, PORT), AgeRequestHandler)
+    server = ThreadingHTTPServer((HOST, PORT), UntilRequestHandler)
     server.daemon_threads = True  # чтобы Ctrl+C не ждал зависшие соединения
     print(f"Бэкенд запущен на http://{HOST}:{PORT}")
-    print("Endpoint: GET /api/age?birthdate=1992-12-16")
+    print("Endpoint: GET /api/until?date=2028-07-17")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

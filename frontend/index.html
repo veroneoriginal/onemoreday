@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Сколько Вы прожили</title>
+  <title>One more day</title>
 
   <!-- Иконка вкладки в браузере — отдельный маленький файл-->
   <link rel="icon" href="/image/favicon.png" />
 
   <!-- Описание для поисковиков -->
   <meta name="description"
-        content="Введите дату рождения — и узнайте, сколько дней, часов и секунд уже уместилось в Вашей жизни." />
+        content="Иногда нам нужна поддержка. А иногда — просто маленькое напоминание о важном." />
 
   <!-- Open Graph: то, что покажет Telegram, WhatsApp, ВКонтакте и прочие,
        когда кто-то отправит ссылку.  -->
@@ -18,17 +18,17 @@
   <meta property="og:url" content="https://onemoreday.fun/" />
   <meta property="og:site_name" content="onemoreday.fun" />
   <meta property="og:locale" content="ru_RU" />
-  <meta property="og:title" content="Сколько Вы прожили?" />
+  <meta property="og:title" content="Хорошо, что Вы здесь" />
   <meta property="og:description"
-        content="Введите дату рождения — и узнайте, сколько дней, часов и секунд уже уместилось в Вашей жизни." />
+        content="Иногда нам нужна поддержка. А иногда — просто маленькое напоминание о важном." />
   <meta property="og:image" content="https://onemoreday.fun/image/preview.jpg" />
   <meta property="og:image:width" content="800" />
   <meta property="og:image:height" content="800" />
   <meta property="og:image:alt" content="Солнце над водой" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Сколько Вы прожили?" />
+  <meta name="twitter:title" content="Хорошо, что Вы здесь" />
   <meta name="twitter:description"
-        content="Введите дату рождения — и узнайте, сколько дней, часов и секунд уже уместилось в Вашей жизни." />
+        content="Иногда нам нужна поддержка. А иногда — просто маленькое напоминание о важном." />
   <meta name="twitter:image" content="https://onemoreday.fun/image/preview.jpg" />
 
   <!-- Vue 3 подключен напрямую с CDN — никакой сборки и npm не нужно -->
@@ -42,13 +42,25 @@
   <!-- Сюда Vue смонтирует приложение -->
   <div id="app">
     <div class="card">
-      <!-- Экранов три: 'form' -> 'wish' -> 'share'.
+      <!-- Два пути: 'welcome' -> 'wish' -> 'share' (поддержка)
+           и 'welcome' -> 'form' -> 'result' -> 'share' (подсчёт даты).
            Заголовок свой у каждого, собирается в computed title. -->
       <h1>{{ title }}</h1>
 
+      <!-- ЭКРАН 0: приветствие — куда человек попал -------------------- -->
+      <template v-if="screen === 'welcome'">
+        <div class="intro">
+          <p>Иногда нам нужна поддержка.</p>
+          <p>А иногда&nbsp;— просто маленькое напоминание о&nbsp;важном.</p>
+        </div>
+
+        <button class="wide" @click="showWish">Получить поддержку</button>
+        <button class="outline wide" @click="showForm">Посчитать важную дату</button>
+      </template>
+
       <!-- ЭКРАН 1: форма и подсчёт ------------------------------------- -->
-      <template v-if="screen === 'form'">
-        <p class="subtitle">Введите дату рождения — всё посчитаем.</p>
+      <template v-else-if="screen === 'form'">
+        <p class="subtitle">А мы всё посчитаем)</p>
 
         <div class="form">
           <!-- Восемь клеток под ДДММГГГГ.
@@ -93,18 +105,19 @@
 
         <!-- Ошибка от бэкенда или сети -->
         <p v-if="error" class="error">{{ error }}</p>
+      </template>
 
-        <!-- Результат: показывается только когда он есть.
-             Это разбивка, а не перевод одного срока в разные единицы:
-             каждая единица — остаток после предыдущей. -->
-        <div v-if="result" class="result">
-          <p>Вы прожили:</p>
+      <!-- ЭКРАН 1.5: сколько осталось до события ------------------------ -->
+      <!-- Это разбивка, а не перевод одного срока в разные единицы:
+           каждая единица — остаток после предыдущей. -->
+      <template v-else-if="screen === 'result'">
+        <div class="result">
           <ul class="age">
             <li v-for="part in ageParts" :key="part.label">
               <b>{{ part.value }}</b> {{ part.label }}
             </li>
           </ul>
-          <button class="wide" @click="showWish">Понятно</button>
+          <button class="wide" @click="showShare">Спасибо</button>
         </div>
       </template>
 
@@ -121,10 +134,11 @@
           </template>
         </div>
 
-        <p class="wish-box">
-          Сегодня к сумме Вашей жизни добавляется ещё один день.
-          Так пусть же он будет {{ wish }}.
-        </p>
+        <!-- Первая фраза всегда одна и та же, вторая — случайная из WISHES в app.js -->
+        <div class="wish-box">
+          <p>Сегодня к сумме Вашей жизни добавляется ещё один день.</p>
+          <p>{{ wish }}</p>
+        </div>
 
         <p v-if="shareError" class="error">{{ shareError }}</p>
 
@@ -140,8 +154,8 @@
 
         <p v-if="shareError" class="error">{{ shareError }}</p>
 
-        <!-- Возврат к началу: reset() чистит всё и возвращает на первый экран -->
-        <button class="wide" @click="reset">Посчитать заново</button>
+        <!-- Возврат к началу: goHome() чистит всё и возвращает на приветствие -->
+        <button class="wide" @click="goHome">В начало</button>
 
         <!-- Поделиться ссылкой на сервис: системное меню на телефоне,
              копирование в буфер на компьютере -->

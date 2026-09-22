@@ -38,6 +38,24 @@ h1 {
   text-align: center;
 }
 
+/* Приветствие: несколько коротких абзацев по центру */
+.intro {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.intro p {
+  margin: 0 0 12px;
+}
+
+/* Последняя фраза — подсказка, что здесь можно сделать: тише основного текста */
+.intro-note {
+  color: #6b7280;
+  font-size: 15px;
+}
+
 /* Форма теперь в столбик: ряд клеток, подпись, кнопка */
 .form {
   display: flex;
@@ -169,6 +187,15 @@ button.outline {
   color: #4338ca;
   font-size: 16px;
   line-height: 1.5;
+}
+
+/* Абзацы внутри рамки: постоянная фраза и пожелание */
+.wish-box p {
+  margin: 0;
+}
+
+.wish-box p + p {
+  margin-top: 10px;
 }
 
 /* Экран «поделиться»: QR-код и подпись под ним */
