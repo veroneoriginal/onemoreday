@@ -1,0 +1,25 @@
+name: onemoreday
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: backend
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: frontend
+
+  nginx:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+      - frontend

@@ -13,14 +13,16 @@
 """
 
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
 from age_calculator import calculate_until, parse_date
 
-# Из интернета к бэкенду напрямую не достучаться:
-# снаружи запросы принимает nginx и уже он передаёт их сюда.
-HOST = "127.0.0.1"
+# На своей машине слушаем только localhost: порт снаружи не торчит.
+# В Docker-образе переменная HOST=0.0.0.0. Иначе процесс слушает
+# localhost контейнера, и проброшенный порт до него не доходит.
+HOST = os.environ.get("HOST", "127.0.0.1")
 PORT = 8000
 
 
