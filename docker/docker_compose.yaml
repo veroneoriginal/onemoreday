@@ -2,18 +2,21 @@ name: onemoreday
 
 services:
   backend:
+    image: onemoreday-backend
     build:
       context: ..
       dockerfile: docker/Dockerfile
       target: backend
 
   frontend:
+    image: onemoreday-frontend
     build:
       context: ..
       dockerfile: docker/Dockerfile
       target: frontend
 
   nginx:
+    image: onemoreday-nginx
     build:
       context: ..
       dockerfile: docker/Dockerfile
