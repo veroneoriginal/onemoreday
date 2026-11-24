@@ -1,32 +1,22 @@
 name: onemoreday
 
 services:
-  backend:
+  onemoreday-backend:
+    container_name: onemoreday-backend
     image: onemoreday-backend
     build:
       context: ..
       dockerfile: docker/Dockerfile
       target: backend
 
-  frontend:
+  onemoreday-frontend:
+    container_name: onemoreday-frontend
     image: onemoreday-frontend
     build:
       context: ..
       dockerfile: docker/Dockerfile
       target: frontend
 
-  nginx:
-    image: onemoreday-nginx
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-      target: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-    depends_on:
-      - backend
-      - frontend
+networks:
+  default:
+    name: onemoreday

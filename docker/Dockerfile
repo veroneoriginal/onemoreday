@@ -18,6 +18,3 @@ RUN npm run build
 
 FROM nginx:1.27-alpine AS frontend
 COPY --from=frontend-build /app/dist /usr/share/nginx/html
-
-FROM nginx:1.27-alpine AS nginx
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
