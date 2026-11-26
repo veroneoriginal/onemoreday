@@ -143,6 +143,12 @@ export default function App() {
   }, [screen]);
 
   useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    document.getElementById(id)?.scrollIntoView();
+  }, []);
+
+  useEffect(() => {
     if (!copied) return undefined;
     const timer = setTimeout(() => setCopied(false), 2000);
     return () => clearTimeout(timer);
@@ -307,99 +313,300 @@ export default function App() {
   }
 
   return (
-    <div className="card">
-      <h1>{titleFor(screen)}</h1>
+    <>
+      <section id="sidebar">
+        <div className="inner">
+          <nav>
+            <ul>
+              <li><a href="#intro">Начало</a></li>
+              <li><a href="#what">Что мы делаем</a></li>
+              <li><a href="#support">Поддержка</a></li>
+              <li><a href="#courses">Курсы</a></li>
+              <li><a href="#subscribe">Контакты</a></li>
+            </ul>
+          </nav>
+        </div>
+      </section>
 
-      {screen === "welcome" && (
-        <>
-          <div className="intro">
-            <p>Иногда нам нужна поддержка.</p>
-            <p>А иногда&nbsp;— просто маленькое напоминание о&nbsp;важном.</p>
+      <div id="wrapper">
+        <section id="intro" className="wrapper style1 fullscreen fade-up">
+          <div className="inner">
+            <h1>One More Day — пространство для себя</h1>
+            <p>Поддержка, образовательные материалы и инструменты самопознания,<br />
+            которые помогают лучше понимать себя и повседневную жизнь</p>
           </div>
-          <button className="wide" type="button" onClick={showWish}>
-            Получить поддержку
-          </button>
-          <button className="outline wide" type="button" onClick={showForm}>
-            Посчитать важную дату
-          </button>
-        </>
-      )}
+        </section>
 
-      {screen === "form" && (
-        <>
-          <p className="subtitle">А мы всё посчитаем)</p>
-          <div className="form">
-            <DateCells
-              digits={digits}
-              cellRefs={cellRefs}
-              onInput={onInput}
-              onKeyDown={onKeyDown}
-              onPaste={onPaste}
-            />
-            <p className="hint">день · месяц · год</p>
-            <div className="buttons">
-              <button type="button" onClick={calculate} disabled={loading}>
-                {loading ? "Считаю…" : "Посчитать"}
-              </button>
-              <button
-                className="secondary"
-                type="button"
-                onClick={reset}
-                disabled={loading || isEmpty}
-              >
-                Очистить
-              </button>
+        <section id="what" className="wrapper style3 fade-up">
+          <div className="inner">
+            <h2>Что мы делаем</h2>
+            <p>Мы объединяем доступные знания, практические материалы и небольшие инструменты, которые помогают лучше ориентироваться в повседневной жизни. Наша задача — сделать полезную информацию понятной, доступной и применимой на практике.</p>
+            <div className="features">
+              <section>
+                <h3>Понятно объясняем</h3>
+                <p>Переводим сложные идеи и концепции на доступный язык, без лишней терминологии и перегруженных объяснений.</p>
+              </section>
+              <section>
+                <h3>Делаем знания практичными</h3>
+                <p>Предлагаем не только теорию, но и конкретные подходы, упражнения и идеи, которые можно использовать в жизни.</p>
+              </section>
+              <section>
+                <h3>Создаём возможности для обучения</h3>
+                <p>Разрабатываем образовательные материалы, которые можно изучать самостоятельно, в комфортном темпе и без привязки к расписанию.</p>
+              </section>
+              <section>
+                <h3>Оставляем пространство для своего выбора</h3>
+                <p>Не навязываем универсальных решений. Помогаем знакомиться с новыми идеями и самостоятельно выбирать то, что подходит именно вам.</p>
+              </section>
             </div>
           </div>
-          {error && <p className="error">{error}</p>}
-        </>
-      )}
+        </section>
 
-      {screen === "result" && result && (
-        <div className="result">
-          <ul className="age">
-            {ageParts(result).map((part) => (
-              <li key={part.label}>
-                <b>{part.value}</b> {part.label}
-              </li>
-            ))}
-          </ul>
-          <button className="wide" type="button" onClick={showShare}>
-            Спасибо
-          </button>
-        </div>
-      )}
+        <section id="support" className="wrapper style1 fade-up">
+          <div className="inner">
+            {screen === "welcome" && (
+              <div className="support-welcome">
+                <h2>{titleFor(screen)}</h2>
+                <p>Иногда нужна поддержка. Иногда — возможность остановиться и вспомнить о чём-то важном. Здесь можно найти несколько добрых слов для себя или посчитать время до события, которого вы ждёте.</p>
+                <div className="support-choices">
+                  <article className="support-choice">
+                    <h3>Получить поддержку</h3>
+                    <p>Небольшое напоминание, которое может оказаться кстати именно сегодня.</p>
+                    <button className="button" type="button" onClick={showWish}>
+                      Получить
+                    </button>
+                  </article>
+                  <article className="support-choice">
+                    <h3>Посчитать важную дату</h3>
+                    <p>Узнайте, сколько времени осталось до события, которое вы с нетерпением ждёте.</p>
+                    <button className="button" type="button" onClick={showForm}>
+                      Посчитать
+                    </button>
+                  </article>
+                </div>
+              </div>
+            )}
 
-      {screen === "wish" && (
-        <>
-          <p className="subtitle"> </p>
-          <DateCells digits={todayDigits} readOnly />
-          <div className="wish-box">
-            <p>Сегодня к сумме Вашей жизни добавляется ещё один день.</p>
-            <p>{wish}</p>
+            {screen !== "welcome" && (
+            <div className="split style1">
+              <section className="support-block">
+                <h2>{titleFor(screen)}</h2>
+
+                {screen === "form" && (
+                  <>
+                    <p className="subtitle">А мы всё посчитаем)</p>
+                    <DateCells
+                      digits={digits}
+                      cellRefs={cellRefs}
+                      onInput={onInput}
+                      onKeyDown={onKeyDown}
+                      onPaste={onPaste}
+                    />
+                    <p className="hint">день · месяц · год</p>
+                    {error && <p className="error">{error}</p>}
+                  </>
+                )}
+
+                {screen === "result" && result && (
+                  <ul className="age">
+                    {ageParts(result).map((part) => (
+                      <li key={part.label}>
+                        <b>{part.value}</b> {part.label}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {screen === "wish" && (
+                  <>
+                    <DateCells digits={todayDigits} readOnly />
+                    <div className="wish-box">
+                      <p>Сегодня к сумме Вашей жизни добавляется ещё один день.</p>
+                      <p>{wish}</p>
+                    </div>
+                    {shareError && <p className="error">{shareError}</p>}
+                  </>
+                )}
+
+                {screen === "share" && (
+                  <>
+                    <img className="qr" src={qrDataUrl} alt="QR-код со ссылкой на этот сайт" />
+                    <p className="share-text">
+                      Поделитесь хорошим настроением с теми, кто Вам дорог!
+                    </p>
+                    {shareError && <p className="error">{shareError}</p>}
+                  </>
+                )}
+              </section>
+
+              <section>
+                <ul className="actions stacked">
+                  {screen === "form" && (
+                    <>
+                      <li>
+                        <button className="button primary fit" type="button" onClick={calculate} disabled={loading}>
+                          {loading ? "Считаю…" : "Посчитать"}
+                        </button>
+                      </li>
+                      <li>
+                        <button className="button fit" type="button" onClick={reset} disabled={loading || isEmpty}>
+                          Очистить
+                        </button>
+                      </li>
+                    </>
+                  )}
+                  {(screen === "result" || screen === "wish") && (
+                    <li>
+                      <button className="button primary fit" type="button" onClick={showShare}>
+                        Спасибо
+                      </button>
+                    </li>
+                  )}
+                  {screen === "share" && (
+                    <>
+                      <li>
+                        <button className="button primary fit" type="button" onClick={goHome}>
+                          В начало
+                        </button>
+                      </li>
+                      <li>
+                        <button className="button fit" type="button" onClick={share}>
+                          {copied ? "Ссылка скопирована" : "Поделиться"}
+                        </button>
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </section>
+            </div>
+            )}
           </div>
-          {shareError && <p className="error">{shareError}</p>}
-          <button className="wide" type="button" onClick={showShare}>
-            Спасибо
-          </button>
-        </>
-      )}
+        </section>
 
-      {screen === "share" && (
-        <>
-          <img className="qr" src={qrDataUrl} alt="QR-код со ссылкой на этот сайт" />
-          <p className="share-text">
-            Поделитесь хорошим настроением с теми, кто Вам дорог!
-          </p>
-          {shareError && <p className="error">{shareError}</p>}
-          <button className="wide" type="button" onClick={goHome}>
-            В начало
-          </button>
-          <button className="outline wide" type="button" onClick={share}>
-            {copied ? "Ссылка скопирована" : "Поделиться"}
-          </button>
-        </>
-      )}
-    </div>
+        <section id="courses" className="wrapper style2 spotlights">
+          <section>
+            <a
+              href="#"
+              className="image"
+              onClick={(event) => event.preventDefault()}
+              style={{ backgroundImage: "url(/images/pic01.jpg)", backgroundPosition: "center center" }}
+            >
+              <img src="/images/pic01.jpg" alt="" />
+            </a>
+            <div className="content">
+              <div className="inner">
+                <h2>Постановка целей и личная эффективность</h2>
+                <p>Практический курс для тех, кто хочет научиться не просто мечтать, а планировать и достигать свои цели, эффективно управлять временем, преодолевать прокрастинацию и формировать полезные привычки. Курс поможет превратить развитие из теории в конкретные действия, которые ведут к реальным изменениям в жизни и карьере.</p>
+                <ul className="actions">
+                  <li><a href="https://stepik.org/a/245211" className="button" target="_blank" rel="noreferrer">Подробнее</a></li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section>
+            <a
+              href="#"
+              className="image"
+              onClick={(event) => event.preventDefault()}
+              style={{ backgroundImage: "url(/images/pic02.jpg)", backgroundPosition: "top center" }}
+            >
+              <img src="/images/pic02.jpg" alt="" />
+            </a>
+            <div className="content">
+              <div className="inner">
+                <h2>Самооценка и уверенность в себе</h2>
+                <p>Курс предназначен для тех, кто устал сомневаться в себе, постоянно себя критиковать и хочет наконец почувствовать внутреннюю опору.</p>
+                <p>Вы научитесь разбираться, откуда берутся неуверенность и низкая самооценка, поймёте, как изменить ограничивающие установки, перестанете обесценивать себя и начнёте строить здоровые отношения с самим собой. Практические техники и примеры помогут вам уверенно действовать в любой ситуации, спокойно отстаивать свои границы и ценить себя по-настоящему.</p>
+                <ul className="actions">
+                  <li><a href="https://stepik.org/a/244823" className="button" target="_blank" rel="noreferrer">Подробнее</a></li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section>
+            <a
+              href="#"
+              className="image"
+              onClick={(event) => event.preventDefault()}
+              style={{ backgroundImage: "url(/images/pic03.jpg)", backgroundPosition: "25% 25%" }}
+            >
+              <img src="/images/pic03.jpg" alt="" />
+            </a>
+            <div className="content">
+              <div className="inner">
+                <h2>Выгорание под контролем: сохраняем баланс и энергию</h2>
+                <p>Этот курс поможет вам разобраться в природе профессионального и эмоционального выгорания, научиться вовремя распознавать его симптомы, выявлять внутренние и внешние причины, а главное — выстроить личную систему профилактики, восстановления и устойчивости. Вы узнаете, как сохранить баланс между работой и личной жизнью, поддерживать свою продуктивность без вреда для здоровья и предотвратить повторное выгорание в будущем.</p>
+                <ul className="actions">
+                  <li><a href="https://stepik.org/a/245236" className="button" target="_blank" rel="noreferrer">Подробнее</a></li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section>
+            <a
+              href="#"
+              className="image"
+              onClick={(event) => event.preventDefault()}
+              style={{ backgroundImage: "url(/images/pic04.jpg)", backgroundPosition: "center center" }}
+            >
+              <img src="/images/pic04.jpg" alt="" />
+            </a>
+            <div className="content">
+              <div className="inner">
+                <h2>Эмоциональный интеллект и управление эмоциями</h2>
+                <p>В современном мире умение управлять своими эмоциями и понимать эмоции других людей становится не просто полезным, а необходимым навыком. Эмоциональный интеллект напрямую влияет на качество жизни, устойчивость к стрессу, эффективность в общении и способность принимать взвешенные решения даже в напряжённых ситуациях.</p>
+                <ul className="actions">
+                  <li><a href="https://stepik.org/a/244446" className="button" target="_blank" rel="noreferrer">Подробнее</a></li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section>
+            <a
+              href="#"
+              className="image"
+              onClick={(event) => event.preventDefault()}
+              style={{ backgroundImage: "url(/images/pic05.jpg)", backgroundPosition: "top center" }}
+            >
+              <img src="/images/pic05.jpg" alt="" />
+            </a>
+            <div className="content">
+              <div className="inner">
+                <h2>Как правильно завести собаку и не пожалеть об этом</h2>
+                <p>Курс предназначен для тех, кто хочет завести собаку.</p>
+                <p>Вы узнаете, как грамотно подготовиться к каждому этапу — от мотивации и выбора питомца до заботы о его здоровье, воспитания и сопровождения в пожилом возрасте. Этот курс поможет вам подготовиться, избежать распространённых ошибок и выстроить тёплые, уважительные отношения с собакой. Курс поможет Вам принять взвешенное и ответственное решение о том, готовы ли вы к появлению собаки в своей жизни.</p>
+                <ul className="actions">
+                  <li><a href="https://stepik.org/course/250228/promo" className="button" target="_blank" rel="noreferrer">Подробнее</a></li>
+                </ul>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="subscribe" className="wrapper style1 fade-up">
+          <div className="inner">
+            <h2>Контакты</h2>
+            <p>One More Day — это не только материалы и курсы. Нам важно знать, что вам интересно, отвечать на вопросы и делиться полезным.</p>
+            <h3>Группа в Telegram</h3>
+            <ul className="actions">
+              <li>
+                <a
+                  href="https://t.me/+ydaSw9HsPzZlY2Ey"
+                  className="button primary icon brands fa-telegram"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Telegram
+                </a>
+              </li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <footer id="footer">
+        <p>&copy; 2026 One More Day</p>
+      </footer>
+    </>
   );
 }

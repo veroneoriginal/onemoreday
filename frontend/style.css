@@ -1,220 +1,288 @@
-/* Простые стили, чтобы страница выглядела опрятно. Ничего лишнего. */
+/* Стили карточки поддержки. Общие стили страницы — у шаблона Hyperspace. */
 
-* {
-  box-sizing: border-box;
+html {
+  scroll-behavior: smooth;
 }
 
-body {
+/* Шаблон на узком экране прячет перенос в первом абзаце. Нам он нужен. */
+#intro p br {
+  display: block;
+}
+
+#what,
+#support,
+#courses,
+#subscribe {
+  scroll-margin-top: 4em;
+}
+
+/* В шаблоне фото карточек курсов рисуется фоном, сам img прячется. */
+.spotlights > section > .image img {
+  display: none;
+}
+
+/* Картинка задаёт высоту карточки. Текст рядом ужат, чтобы поместиться в неё. */
+#courses.spotlights > section {
+  align-items: stretch;
+  height: 16em;
+  min-height: 0;
+}
+
+#courses.spotlights > section > .image {
+  width: 16em;
+  height: auto;
+  flex: 0 0 16em;
   margin: 0;
-  min-height: 100vh;
+}
+
+#courses.spotlights > section > .content {
+  padding: 0.85em 1.5em;
+  overflow: hidden;
+  justify-content: center;
+}
+
+#courses.spotlights > section > .content h2 {
+  font-size: 1.2em;
+  line-height: 1.25;
+  margin: 0 0 0.28em;
+}
+
+#courses.spotlights > section > .content p {
+  font-size: 0.78em;
+  line-height: 1.4;
+  margin: 0 0 0.4em;
+}
+
+#courses.spotlights > section > .content .actions {
+  margin-top: 0.2em;
+}
+
+#courses.spotlights > section > .content .button {
+  height: auto;
+  font-size: 0.55em;
+  line-height: 1.2;
+  padding: 0.65em 1.25em;
+}
+
+@media screen and (max-width: 980px) {
+  #courses.spotlights > section {
+    height: auto;
+  }
+
+  #courses.spotlights > section > .image {
+    width: 16em;
+    height: 16em;
+    flex: none;
+    margin: 1.25em auto 0;
+  }
+
+  #courses.spotlights > section > .content {
+    height: auto;
+    overflow: visible;
+    padding: 1.25em 1.5em 1.1em;
+  }
+}
+
+/* У шаблона фон задан только у второй и третьей карточки. Четвёртая и пятая повторяют его. */
+.spotlights > section:nth-child(4) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.spotlights > section:nth-child(5) {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Блок поддержки набирается шрифтом шаблона и занимает всю ширину секции.
+   Текст слева, кнопки справа — это split шаблона. */
+.support-block {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.support-block .intro p {
+  margin: 0 0 1em;
+}
+
+.support-block .subtitle,
+.support-block .hint,
+.support-block .share-text {
+  text-align: left;
+}
+
+.support-block .hint {
+  margin: 0.6em 0 0;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.8em;
+}
+
+.support-block .date-fields {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: #1f2937;
+  gap: 0.35em;
 }
 
-.card {
-  background: #fff;
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  width: 380px;
-  max-width: 90vw;
-}
-
-/* Заголовок и подзаголовок — по центру карточки, как клетки и подписи под ними */
-h1 {
-  margin: 0 0 4px;
-  font-size: 24px;
+.support-block input.cell,
+.support-block .cell.readonly {
+  width: 1.7em;
+  height: auto;
+  padding: 0.4em 0;
+  display: inline-block;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  line-height: 1.2;
   text-align: center;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.25em;
 }
 
-.subtitle {
-  margin: 0 0 20px;
-  color: #6b7280;
-  font-size: 14px;
-  text-align: center;
+.support-block .cell.readonly {
+  color: rgba(255, 255, 255, 0.55);
 }
 
-/* Приветствие: несколько коротких абзацев по центру */
-.intro {
-  margin: 16px 0 0;
-  text-align: center;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-.intro p {
-  margin: 0 0 12px;
-}
-
-/* Последняя фраза — подсказка, что здесь можно сделать: тише основного текста */
-.intro-note {
-  color: #6b7280;
-  font-size: 15px;
-}
-
-/* Форма теперь в столбик: ряд клеток, подпись, кнопка */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Ряд из восьми клеток с точками-разделителями */
-.date-fields {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-}
-
-.cell {
-  width: 30px;
-  padding: 10px 0;
-  font-size: 18px;
-  text-align: center;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
+.support-block input.cell:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px #ffffff;
   outline: none;
 }
 
-/* Те же клетки, но не для ввода: показываем в них сегодняшнюю дату */
-.cell.readonly {
-  display: inline-block;
-  background: #f9fafb;
-  color: #6b7280;
-  line-height: 1;
+.support-block .dot {
+  color: rgba(255, 255, 255, 0.35);
 }
 
-.cell:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+.support-block .error {
+  color: #ff9b9b;
 }
 
-.dot {
-  color: #9ca3af;
-  font-size: 18px;
-  padding: 0 2px;
-}
-
-.hint {
-  margin: 0 0 4px;
-  text-align: center;
-  color: #9ca3af;
-  font-size: 12px;
-}
-
-/* Две кнопки в ряд, делят ширину поровну */
-.buttons {
-  display: flex;
-  gap: 8px;
-}
-
-button {
-  flex: 1;
-  padding: 10px 16px;
-  font-size: 16px;
-  color: #fff;
-  background: #6366f1;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* "Очистить" — второстепенная кнопка, не спорит с "Посчитать" */
-button.secondary {
-  color: #6366f1;
-  background: #eef2ff;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.error {
-  margin-top: 16px;
-  color: #dc2626;
-  font-size: 14px;
-}
-
-.result {
-  margin-top: 20px;
-}
-
-.result p {
-  margin: 0 0 8px;
-  font-weight: 600;
-}
-
-/* Разбивка возраста: каждая единица на своей строке */
-.result .age {
+.support-block .age {
   margin: 0;
-  padding-left: 20px;
-  font-size: 16px;
-  line-height: 1.8;
+  padding: 0;
+  list-style: none;
 }
 
-/* Кнопка во всю ширину карточки: «Понятно» и «Спасибо» */
-button.wide {
-  width: 100%;
-  margin-top: 20px;
+.support-block .age li {
+  margin: 0 0 0.35em;
 }
 
-/* Две широкие кнопки подряд — между собой стоят теснее, чем от текста над ними */
-button.wide + button.wide {
-  margin-top: 8px;
+.support-block .wish-box {
+  margin-top: 1.25em;
+  padding: 1em 1.25em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.25em;
 }
 
-/* «Поделиться» — та же палитра, но контуром: рядом с «Посчитать заново»
-   она не должна спорить за внимание */
-button.outline {
-  color: #6366f1;
-  background: #fff;
-  border: 1px solid #c7d2fe;
-}
-
-/* Само пожелание — в рамке, чтобы читалось как отдельная мысль */
-.wish-box {
-  margin: 20px 0 0;
-  padding: 16px;
-  border: 1px solid #c7d2fe;
-  border-radius: 12px;
-  background: #eef2ff;
-  color: #4338ca;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
-/* Абзацы внутри рамки: постоянная фраза и пожелание */
-.wish-box p {
+.support-block .wish-box p {
   margin: 0;
 }
 
-.wish-box p + p {
-  margin-top: 10px;
+.support-block .wish-box p + p {
+  margin-top: 0.75em;
 }
 
-/* Экран «поделиться»: QR-код и подпись под ним */
-.qr {
+.support-block .qr {
   display: block;
   width: 180px;
   height: 180px;
-  margin: 20px auto 0;
-  image-rendering: pixelated; /* чтобы клетки кода не размывались */
+  padding: 8px;
+  background: #ffffff;
+  image-rendering: pixelated;
 }
 
-.share-text {
-  margin: 16px 0 0;
+/* Кнопки шаблона рассчитаны на короткую английскую подпись.
+   Наши длиннее, поэтому кнопка тянется на ширину правой колонки и может перенести строку. */
+#what .features section {
+  padding-left: 3em;
+}
+
+/* У шаблона снизу отступ меньше, чем сверху, и блок поддержки визуально садится вниз. */
+#support > .inner {
+  padding-bottom: 5em;
+}
+
+@media screen and (max-width: 1680px) {
+  #support > .inner {
+    padding-bottom: 4em;
+  }
+}
+
+@media screen and (max-width: 736px) {
+  #support > .inner {
+    padding-bottom: 3em;
+  }
+}
+
+#support .button {
+  height: auto;
+  line-height: 1.35;
+  padding: 1.15em 1.25em;
+  white-space: normal;
+}
+
+.support-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25em;
+  align-items: stretch;
+}
+
+.support-choice {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  color: #312450;
+  border-radius: 1em;
+  padding: 1.35em 1.4em 1.2em;
+}
+
+.support-choice h3 {
+  color: #312450;
+  font-size: 1.15em;
+  line-height: 1.35;
+  margin: 0 0 0.45em;
+}
+
+.support-choice p {
+  color: #4a3d6b;
+  margin: 0 0 1.25em;
+  flex: 1;
+}
+
+.support-choice .button {
+  width: 100%;
+  margin-top: auto;
+  height: auto;
+  padding: 0.9em 1em;
+  background: #5e42a6 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  border-radius: 0.75em;
+  font-size: 1em;
+  font-weight: bold;
+  letter-spacing: normal;
+  line-height: 1.3;
   text-align: center;
-  color: #6b7280;
-  font-size: 15px;
-  line-height: 1.5;
+  text-transform: none;
+  white-space: normal;
 }
 
-.result b {
-  color: #6366f1;
+.support-choice .button:after {
+  display: none;
+}
+
+@media screen and (max-width: 736px) {
+  .support-choices {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Нижняя полоса: одна строка, без отступов секции шаблона. */
+#footer {
+  padding: 1em 2.5em 1.25em;
+}
+
+#footer p {
+  margin: 0;
+  font-size: 0.8em;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.45);
 }
